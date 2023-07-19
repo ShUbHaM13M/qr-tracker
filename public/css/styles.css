@@ -1,0 +1,71 @@
+*,
+*::before,
+*::after {
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+}
+
+:root {
+  --color-secondary: #001b2e;
+  --color-white: #f5f3f5;
+  --color-accent: #1e96fc;
+  --radius: 0.4em;
+}
+
+body {
+  background-color: var(--color-secondary);
+  color: var(--color-white);
+}
+
+main {
+  min-height: 100vh;
+  display: flex;
+  gap: 1.4em;
+  flex-direction: column;
+  align-items: center;
+  padding-block: 2em;
+}
+
+hr {
+  width: 80%;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 1em;
+  align-items: center;
+}
+
+form div {
+  display: flex;
+  gap: 1em;
+}
+
+input {
+  padding: 0.6em 1em;
+  background-color: var(--color-white);
+  border: none;
+  border-radius: var(--radius);
+  outline: none;
+}
+input:focus {
+  outline: none;
+}
+
+button {
+  padding: 0.6em 1em;
+  border: none;
+  border-radius: var(--radius);
+  background-color: var(--color-accent);
+  color: var(--color-white);
+  font-weight: 500;
+  font-size: 1rem;
+}
+
+#qrImage {
+  min-height: 200px;
+  aspect-ratio: 1 / 1;
+  border-radius: var(--radius);
+}
