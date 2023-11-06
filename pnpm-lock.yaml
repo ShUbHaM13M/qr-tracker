@@ -20,6 +20,9 @@ dependencies:
   fastify:
     specifier: ^4.19.2
     version: 4.19.2
+  ip:
+    specifier: ^1.1.8
+    version: 1.1.8
   qrcode:
     specifier: ^1.5.3
     version: 1.5.3
@@ -34,9 +37,6 @@ devDependencies:
   '@types/qrcode':
     specifier: ^1.5.1
     version: 1.5.1
-  ip:
-    specifier: ^1.1.8
-    version: 1.1.8
   nodemon:
     specifier: ^2.0.22
     version: 2.0.22
@@ -650,7 +650,7 @@ packages:
 
   /ip@1.1.8:
     resolution: {integrity: sha512-PuExPYUiu6qMBQb4l06ecm6T6ujzhmh+MeJcW9wa89PoAz5pvd4zPgN5WJV104mb6S2T1AwNIAaB70JNrLQWhg==}
-    dev: true
+    dev: false
 
   /ip@2.0.0:
     resolution: {integrity: sha512-WKa+XuLG1A1R0UWhl2+1XQSi+fZWMsYKffMZTTYsiZaUD8k2yDAj5atimTUD2TZkyCkNEeYE5NhFZmupOGtjYQ==}
@@ -733,6 +733,7 @@ packages:
 
   /memory-pager@1.5.0:
     resolution: {integrity: sha512-ZS4Bp4r/Zoeq6+NLJpP+0Zzm0pR8whtGPf1XExKLJBAczGMnSi3It14OiNCStjQjM6NU1okjQGSxgEZN8eBYKg==}
+    requiresBuild: true
     dev: false
     optional: true
 
@@ -1078,6 +1079,7 @@ packages:
 
   /sparse-bitfield@3.0.3:
     resolution: {integrity: sha512-kvzhi7vqKTfkh0PZU+2D2PIllw2ymqJKujUcyPMd9Y75Nv4nPbGJZXNhxsgdQab2BmlDct1YnfQCguEvHr7VsQ==}
+    requiresBuild: true
     dependencies:
       memory-pager: 1.5.0
     dev: false

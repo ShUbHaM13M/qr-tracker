@@ -1,58 +1,67 @@
 import { FastifyInstance, FastifyRequest } from "fastify";
 import { FastifyRouteConfig } from "fastify/types/route";
-import { addQrCodeInDatabase, updateQrCodeScannedAmount } from "../controllers/qr";
+import {
+  addQrCodeInDatabase,
+  updateQrCodeScannedAmount,
+} from "../controllers/qr";
+
+const CONNECT_MONGO = process.env.CONNECT_MONGO === "1";
 
 type QrRequest = FastifyRequest<{
-  Querystring: { text: string, "qr-id"?: string };
+  Querystring: { text: string; "qr-id"?: string };
 }>;
 
 const qrRoutes = async (
   server: FastifyInstance,
-  _options: FastifyRouteConfig,
+  _options: FastifyRouteConfig
 ) => {
-  server.get("/test-db", async function (_, reply) {
-    const db = this.mongo.db;
-    console.log(db);
-    reply.send({ db: !!db });
-  });
-
-  server.get("/qr", async function (_, reply) {
-    const qrCollection = server.mongo.db?.collection("qr");
-    const qrs = qrCollection?.find();
-    reply.send({
-      qr: qrs?.toArray(),
+  if (CONNECT_MONGO) {
+    server.get("/test-db", async function (_, reply) {
+      const db = this.mongo.db;
+      reply.send({ db: !!db });
     });
-  });
 
-  server.post("/add-qr", async function (req: QrRequest, reply) {
-    const qrCollection = server.mongo.db?.collection("qr");
-    if (!req.query.text) {
-      return reply.send({ error: "No text input" });
-    }
-
-    if (!qrCollection) {
-      return reply.send({ error: "Unable to get the collection" });
-    }
-
-    addQrCodeInDatabase(qrCollection, {
-      text: req.query.text,
-      times_scanned: 0,
+    server.get("/qr", async function (_, reply) {
+      const qrCollection = server.mongo.db?.collection("qr");
+      const qrs = qrCollection?.find();
+      reply.send({
+        qr: qrs?.toArray(),
+      });
     });
-  });
 
-  server.get('/qr-scanned', async function (req: QrRequest, reply) {
-    const qrCollection = server.mongo.db?.collection("qr");
-    const text = req.query.text
-    const qrId = req.query["qr-id"]
+    server.post("/add-qr", async function (req: QrRequest, reply) {
+      const qrCollection = server.mongo.db?.collection("qr");
+      if (!req.query.text) {
+        return reply.send({ error: "No text input" });
+      }
 
-    if (!qrCollection) {
-      return reply.send({ error: "Unable to get the collection" });
+      if (!qrCollection) {
+        return reply.send({ error: "Unable to get the collection" });
+      }
+
+      addQrCodeInDatabase(qrCollection, {
+        text: req.query.text,
+        times_scanned: 0,
+      });
+    });
+  }
+
+  server.get("/qr-scanned", async function (req: QrRequest, reply) {
+    const text = req.query.text;
+    if (CONNECT_MONGO) {
+      const qrCollection = server.mongo.db?.collection("qr");
+
+      const qrId = req.query["qr-id"];
+
+      if (!qrCollection) {
+        return reply.send({ error: "Unable to get the collection" });
+      }
+
+      const doc = await updateQrCodeScannedAmount(qrCollection, qrId, text);
+      console.log(doc);
     }
-
-    const doc = await updateQrCodeScannedAmount(qrCollection, qrId, text)
-    console.log(doc)
-    return reply.view("/templates/qr-scanned.ejs", { text })
-  })
+    return reply.view("/templates/qr-scanned.ejs", { text });
+  });
 };
 
 export default qrRoutes;

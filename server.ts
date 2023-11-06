@@ -8,6 +8,8 @@ import ip from "ip";
 import qrRoutes from "./routes/qr";
 import { addQrCodeInDatabase } from "./controllers/qr";
 
+const CONNECT_MONGO = process.env.CONNECT_MONGO === "1";
+
 const fastify = Fastify({
   logger: true,
 });
@@ -22,11 +24,13 @@ fastify.register(fastifyStatic, {
   root: path.join(__dirname, "public"),
 });
 
-fastify.register(fastifyMongo, {
-  forceClose: true,
-  url:
-    "mongodb+srv://SeyTonic:3fYhytsIpNoXpJtH@cluster0.hd1cp.mongodb.net/RecipeApp?retryWrites=true&w=majority",
-});
+if (CONNECT_MONGO) {
+  const MONGO_URI = process.env.MONGO_URI;
+  fastify.register(fastifyMongo, {
+    forceClose: true,
+    url: MONGO_URI,
+  });
+}
 
 type QrRequest = FastifyRequest<{
   Querystring: { text: string };
@@ -44,21 +48,25 @@ fastify.get("/", async (req: QrRequest, reply) => {
   // Whenever the url endpoint is hit the data regarding the stored qr will be updated
   //
 
+  let qrText = `http://${ip.address()}:${PORT}/qr-scanned?text=${
+    req.query.text
+  }`;
 
-  let qrText = `http://${ip.address()}:${PORT}/qr-scanned?text=${req.query.text}`;
+  if (CONNECT_MONGO) {
+    const qrCollection = fastify.mongo.db?.collection("qr");
+    if (qrCollection) {
+      const doc = await addQrCodeInDatabase(qrCollection, {
+        text: req.query.text,
+        times_scanned: 0,
+      });
 
-  const qrCollection = fastify.mongo.db?.collection("qr");
-  if (qrCollection) {
-    const doc = await addQrCodeInDatabase(qrCollection, {
-      text: req.query.text,
-      times_scanned: 0,
-    });
-
-    qrText += `&?qr-id=${doc.value?._id}`;
+      qrText += `&?qr-id=${doc.value?._id}`;
+    }
   }
 
-  const qrDataURL = await QRCode.toDataURL(qrText)
-    .catch((err) => console.error(err));
+  const qrDataURL = await QRCode.toDataURL(qrText).catch((err) =>
+    console.error(err)
+  );
 
   return reply.view("/templates/index.ejs", { qrDataURL });
 });
