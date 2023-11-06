@@ -1,0 +1,19 @@
+<!-- TODO: Add header, footer as base style and extend -->
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title></title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link href="/css/styles.css" rel="stylesheet" />
+  </head>
+  <body>
+    <main>
+      <% if (qrDataURL) { %>
+      <img id="qrImage" src="<%= qrDataURL %>" alt="QrCode" />
+      <% } %>
+      <!-- TODO: Button to download the QR code as image -->
+      <!-- TODO: Button to print the QR code -->
+    </main>
+  </body>
+</html>
