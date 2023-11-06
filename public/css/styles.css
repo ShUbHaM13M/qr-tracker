@@ -43,15 +43,24 @@ form div {
   gap: 1em;
 }
 
-input {
+input,
+textarea {
   padding: 0.6em 1em;
   background-color: var(--color-white);
   border: none;
   border-radius: var(--radius);
   outline: none;
+  resize: none;
 }
-input:focus {
+input:focus,
+textarea:focus {
   outline: none;
+}
+
+textarea {
+  min-height: 250px;
+  width: 80vw;
+  max-width: 400px;
 }
 
 button {
@@ -63,9 +72,17 @@ button {
   font-weight: 500;
   font-size: 1rem;
 }
+button:disabled {
+  cursor: not-allowed;
+  filter: brightness(50%);
+}
 
 #qrImage {
-  min-height: 200px;
+  min-height: 220px;
   aspect-ratio: 1 / 1;
   border-radius: var(--radius);
+}
+
+#generateButton {
+  margin-left: auto;
 }
