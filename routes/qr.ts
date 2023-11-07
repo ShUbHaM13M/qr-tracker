@@ -4,11 +4,12 @@ import {
   addQrCodeInDatabase,
   updateQrCodeScannedAmount,
 } from "../controllers/qr";
+import { guessContentType } from "../utils/global";
 
 const CONNECT_MONGO = process.env.CONNECT_MONGO === "1";
 
 type QrRequest = FastifyRequest<{
-  Querystring: { text: string; "qr-id"?: string };
+  Querystring: { text: string; "qr-id"?: string; type?: string };
 }>;
 
 const qrRoutes = async (
@@ -48,6 +49,7 @@ const qrRoutes = async (
 
   server.get("/qr-scanned", async function (req: QrRequest, reply) {
     const text = req.query.text;
+    let type = req.query.type || guessContentType(text);
     if (CONNECT_MONGO) {
       const qrCollection = server.mongo.db?.collection("qr");
 
@@ -60,7 +62,10 @@ const qrRoutes = async (
       const doc = await updateQrCodeScannedAmount(qrCollection, qrId, text);
       console.log(doc);
     }
-    return reply.view("/templates/qr-scanned.ejs", { text });
+    return reply.view("/templates/qr-scanned.ejs", {
+      text,
+      type: type || guessContentType(text),
+    });
   });
 };
 

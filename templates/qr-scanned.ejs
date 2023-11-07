@@ -12,9 +12,21 @@
 
       <hr />
 
-      <p>
-        <%= text %>
-      </p>
+      <% switch (type) {
+        
+        case 'text' : %>
+          <p><%= text %></p>
+        <% break;
+
+        case 'image' : %>
+          <img src="<%= text %>" alt="QR image" />
+        <% break;
+
+        case 'link' : %>
+          <a href="<%= text %>"><%= text %></a>
+        <% break;
+
+      } %>
     </main>
   </body>
 </html>
