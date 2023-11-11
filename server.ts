@@ -7,6 +7,7 @@ import QRCode from "qrcode";
 import ip from "ip";
 import qrRoutes from "./routes/qr";
 import { addQrCodeInDatabase } from "./controllers/qr";
+import { guessContentType } from "./utils/global";
 
 const CONNECT_MONGO = process.env.CONNECT_MONGO === "1";
 
@@ -48,8 +49,13 @@ fastify.get("/", async (req: QrRequest, reply) => {
   // Whenever the url endpoint is hit the data regarding the stored qr will be updated
   //
 
-  let qrText = `http://${ ip.address() }:${ PORT }/qr-scanned?text=${ req.query.text
-    }`;
+  let type = guessContentType(req.query.text);
+  let qrText = `http://${ip.address()}:${PORT}/qr-scanned?text=${
+    req.query.text
+  }`;
+  if (type === "link") {
+    qrText = req.query.text;
+  }
 
   if (CONNECT_MONGO) {
     const qrCollection = fastify.mongo.db?.collection("qr");
@@ -59,7 +65,7 @@ fastify.get("/", async (req: QrRequest, reply) => {
         times_scanned: 0,
       });
 
-      qrText += `&?qr-id=${ doc.value?._id }`;
+      qrText += `&?qr-id=${doc.value?._id}`;
     }
   }
 
@@ -78,7 +84,7 @@ const PORT = 8080;
 const start = async () => {
   try {
     await fastify.listen({ port: PORT, host: ip.address() });
-    console.log(`Server running on: ${ ip.address() }`);
+    console.log(`Server running on: ${ip.address()}`);
   } catch (err) {
     console.error(err);
     process.exit(1);
